@@ -117,6 +117,7 @@
         <li>
             <strong>実行:</strong> <code>main.py</code> を実行します。
             <pre><code>python main.py</code></pre>
+            <p>Python (.py) ファイルが Python インタープリターに関連付けられている場合は、<code>main.py</code> を直接ダブルクリックして起動することも可能です。</p>
         </li>
         <li><strong>OpenAI APIキー設定:</strong> 初回起動時や必要に応じて、設定欄にOpenAI APIキーを入力し「保存」ボタンを押します。</li>
         <li>
@@ -171,6 +172,14 @@
         <li>文字起こしや要約の精度は、元の音声の品質、モデル、プロンプトの内容によって変化します。</li>
         <li><code>ffmpeg</code> の変換処理には時間がかかる場合があります。</li>
     </ul>
+
+    <section>
+        <h2>サポート・フィードバック</h2>
+        <p>
+            本ツールの利用に関するご不明点、バグの報告、改善のご提案などがございましたら、システム管理課までご連絡ください。
+            報告の際は、具体的な操作手順、発生状況、エラーメッセージ、期待する動作などを可能な限り詳しくお伝えいただけますと幸いです。
+        </p>
+    </section>
 
     <h2>ライセンス情報</h2>
 
@@ -283,11 +292,6 @@ Refs: #42</code></pre>
 
     <p>以下の項目については、今後の開発・運用において検討・対応が必要です。</p>
     <ul>
-        <li><strong>ライセンス:</strong>
-            <ul>
-                <li>本アプリケーション配布時には、<code>Faster-Whisper-XXL</code> ディレクトリ内に同梱されている ffmpeg のライセンス条文ファイル (<code>COPYING.LGPLv3</code>, <code>COPYING.LGPLv2.1</code>) も含める必要があります。</li>
-            </ul>
-        </li>
         <li><strong>セキュリティ:</strong>
             <ul>
                 <li><strong>依存ライブラリ更新:</strong> アプリケーションの更新版を社内リリースする際には、<code>requirements.txt</code> を確認し、依存ライブラリのセキュリティ脆弱性をチェック、必要に応じて更新します。</li>
