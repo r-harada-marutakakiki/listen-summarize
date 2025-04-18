@@ -1,0 +1,8 @@
+PyQt5
+openai
+python-docx
+python-pptx
+pypdf
+markdown
+# mutagen # 音声長取得に使用（whisper_utils内でpip install試行）
+# python-vlc # VLC版で使用していたが現在は未使用 

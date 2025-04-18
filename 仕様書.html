@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仕様書 - 取引先説明会要約ツール</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        h1 {
+            font-size: 2em;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-top: 30px;
+        }
+        h3 {
+            font-size: 1.2em;
+            margin-top: 25px;
+        }
+        ul, ol {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        pre code {
+            display: block;
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        strong {
+            font-weight: bold;
+        }
+        em {
+            font-style: italic;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>取引先説明会要約ツール</h1>
+
+    <h2>概要</h2>
+
+    <p>
+        音声/動画ファイル（会議の録画・録音など）から文字起こしを行い、その内容と追加資料（PDF, Word, PowerPoint）を基にOpenAI APIを利用して要約を作成するデスクトップアプリケーションです。
+    </p>
+    <p>
+        過去に生成したSRTファイル（字幕ファイル）を直接読み込んで、要約作成や内容確認を行うことも可能です。
+    </p>
+
+    <h2>主な機能</h2>
+
+    <ul>
+        <li>
+            <strong>音声/動画からの文字起こし:</strong>
+            <ul>
+                <li><code>Faster Whisper XXL</code> のスタンドアロン版 (<code>Faster-Whisper-XXL/faster-whisper-xxl.exe</code>) を使用して高精度な文字起こしを行います。</li>
+                <li>処理中の進捗状況を表示します。</li>
+                <li>文字起こし結果はセグメント（発話区間）ごとに表示されます。</li>
+            </ul>
+        </li>
+        <li><strong>SRTファイルのインポート:</strong> 過去に作成したSRTファイルを読み込み、文字起こし結果として表示できます。</li>
+        <li>
+            <strong>セグメント再生:</strong> 文字起こし結果の各セグメントに対応する音声（元のファイルが必要）を再生できます。
+            <ul>
+                <li>再生にはQtMultimediaを使用し、互換性の問題が発生する場合はffmpegによる一時的なWAVファイル変換を行います。</li>
+            </ul>
+        </li>
+        <li><strong>追加資料の読み込み:</strong> PDF, Word (.docx), PowerPoint (.pptx) ファイルの内容をテキストとして抽出し、要約生成時のコンテキスト情報として利用します。</li>
+        <li>
+            <strong>AIによる要約生成:</strong>
+            <ul>
+                <li>OpenAI API (GPTモデル) を利用して、文字起こし内容と追加資料に基づいた要約を生成します。</li>
+                <li>複数の要約タイプ（標準、短い、詳細分析）やカスタムプロンプト、プロンプトファイルの利用が可能です。</li>
+                <li>要約結果はMarkdown形式で生成され、HTMLに変換してリッチテキスト表示されます。</li>
+            </ul>
+        </li>
+        <li><strong>結果の保存:</strong> 文字起こし全文と生成された要約を、それぞれテキストファイルとして保存できます。</li>
+    </ul>
+
+    <h2>使い方</h2>
+
+    <ol>
+        <li>
+            <strong>実行:</strong> <code>main.py</code> を実行します。
+            <pre><code>python main.py</code></pre>
+        </li>
+        <li><strong>OpenAI APIキー設定:</strong> 初回起動時や必要に応じて、設定欄にOpenAI APIキーを入力し「保存」ボタンを押します。</li>
+        <li>
+            <strong>ファイル選択:</strong>
+            <ul>
+                <li><strong>音声/動画:</strong> 「音声選択...」ボタンで文字起こし対象のファイルを選択します。</li>
+                <li><strong>SRT:</strong> （任意）「SRT読込...」ボタンで既存のSRTファイルを選択します。これを読み込んだ場合、音声ファイル選択や文字起こし実行は不要です。</li>
+                <li><strong>追加資料:</strong> （任意）「追加資料...」ボタンで関連する資料ファイル（PDF, DOCX, PPTX）を選択します。</li>
+                <li><strong>出力ディレクトリ:</strong> （任意）「参照...」ボタンで結果（文字起こし・要約テキストファイル）の保存先を指定します。</li>
+            </ul>
+        </li>
+        <li><strong>文字起こし実行:</strong> （SRTを読み込んでいない場合）音声/動画ファイルを選択後、「文字起こし実行」ボタンを押します。</li>
+        <li><strong>要約タイプ選択:</strong> 「要約」タブで、生成したい要約のタイプを選択します。カスタムプロンプトを使用する場合は、テキストエリアに入力するか、「参照...」でプロンプトファイル（.txt）を選択します。</li>
+        <li><strong>要約作成実行:</strong> 「要約作成実行」ボタンを押します。文字起こしと（必要なら）追加資料の内容を基に、選択したモデルとプロンプトで要約が生成されます。</li>
+        <li>
+            <strong>結果確認:</strong>
+            <ul>
+                <li>「文字起こし」タブで、セグメントごとのテキストと（音声ファイルがある場合）再生ボタンが表示されます。</li>
+                <li>「追加資料」タブで、読み込んだ資料のテキスト内容を確認できます。</li>
+                <li>「要約」タブで、生成された要約がHTML形式で表示されます。</li>
+            </ul>
+        </li>
+        <li><strong>結果保存:</strong> （任意）「結果を保存」ボタンを押すと、文字起こし全文と要約が指定した（またはデフォルトの）出力ディレクトリにテキストファイルとして保存されます。</li>
+    </ol>
+
+    <h2>依存関係</h2>
+
+    <ul>
+        <li><strong>Python 3.x</strong></li>
+        <li>
+            <strong>必要なライブラリ:</strong> <code>requirements.txt</code> を参照してください。以下のコマンドでインストールできます。
+            <pre><code>pip install -r requirements.txt</code></pre>
+            <!-- ここに requirements.txt の内容をリスト化しても良い -->
+            <!-- 例:
+            <ul>
+                <li>PyQt5</li>
+                <li>openai</li>
+                ...
+            </ul>
+             -->
+        </li>
+        <li><strong>Faster Whisper XXL:</strong> プロジェクト内に <code>Faster-Whisper-XXL</code> ディレクトリがあり、その中に <code>faster-whisper-xxl.exe</code> が含まれている必要があります。</li>
+        <li><strong>ffmpeg:</strong> プロジェクト内の <code>Faster-Whisper-XXL</code> ディレクトリに <code>ffmpeg.exe</code> と <code>ffprobe.exe</code> が含まれている必要があります。（音声再生時の互換性維持と文字起こし前の音声長取得のため）</li>
+        <li><strong>(初回のみ) Markdownライブラリ:</strong> 要約のHTML表示のために <code>markdown</code> ライブラリが必要です。初回要約実行時にインストールを試みますが、失敗する場合は手動で <code>pip install markdown</code> を実行してください。</li>
+        <li><strong>(コーデック問題発生時) K-Lite Codec Pack:</strong> QtMultimediaでの音声再生時にエラーが出る場合、コーデックの問題が考えられます。<a href="https://codecguide.com/download_kl.htm" target="_blank" rel="noopener noreferrer">K-Lite Codec Pack</a> の Basic または Standard をインストールすると解決することがあります。</li>
+    </ul>
+
+    <h2>注意事項</h2>
+
+    <ul>
+        <li>OpenAI APIの利用には別途APIキーの取得と利用料金が必要です。</li>
+        <li>文字起こしや要約の精度は、元の音声の品質、モデル、プロンプトの内容によって変化します。</li>
+        <li><code>ffmpeg</code> の変換処理には時間がかかる場合があります。</li>
+    </ul>
+
+    <h2>ライセンス情報</h2>
+
+    <h3>本アプリケーション</h3>
+    <p>
+        本アプリケーションのコードは、<strong>GNU General Public License v3.0 (GPL v3)</strong> に基づいてライセンスされます。
+        このライセンスに基づき、本アプリケーションのソースコードは利用者に提供される必要があります。
+        ライセンスの全文は、プロジェクトルートにある <code>LICENSE</code> ファイル、または <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">GNU公式サイト</a> をご確認ください。
+    </p>
+
+    <h3>Pythonライブラリ</h3>
+    <p>本アプリケーションは、以下の主要なPythonライブラリに依存しています。各ライブラリのライセンスに従ってご利用ください。</p>
+    <ul>
+        <li><strong>PyQt5:</strong> GPL v3 または 商用ライセンス (<a href="https://www.qt.io/licensing/" target="_blank" rel="noopener noreferrer">詳細</a>)</li>
+        <li><strong>openai:</strong> MIT License (<a href="https://github.com/openai/openai-python/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">詳細</a>)</li>
+        <li><strong>python-docx:</strong> MIT License (<a href="https://github.com/python-openxml/python-docx/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">詳細</a>)</li>
+        <li><strong>python-pptx:</strong> MIT License (<a href="https://github.com/scanny/python-pptx/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">詳細</a>)</li>
+        <li><strong>pypdf:</strong> BSD 3-Clause License (<a href="https://github.com/py-pdf/pypdf/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">詳細</a>)</li>
+        <li><strong>markdown:</strong> BSD-style License (<a href="https://github.com/Python-Markdown/markdown/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">詳細</a>)</li>
+        <li><strong>(mutagen):</strong> GPL v2+ (<a href="https://github.com/quodlibet/mutagen/blob/master/COPYING" target="_blank" rel="noopener noreferrer">詳細</a>) ※ whisper_utils内でインストール試行</li>
+    </ul>
+    <p>※上記以外の依存関係も含まれる可能性があります。詳細なライセンス情報は各ライブラリのドキュメントをご確認ください。</p>
+
+    <h3>外部実行ファイル</h3>
+    <ul>
+        <li>
+            <strong>Faster Whisper XXL (faster-whisper-xxl.exe):</strong>
+            <a href="https://github.com/Purfview/whisper-standalone-win" target="_blank" rel="noopener noreferrer">Purfview/whisper-standalone-win</a> で提供されているスタンドアロン版です。
+            これは <a href="https://github.com/guillaumekln/faster-whisper" target="_blank" rel="noopener noreferrer">Faster Whisper</a> (MIT License) をベースにしています。
+            実行にはWhisperモデルが必要であり、モデル自体のライセンス (<a href="https://github.com/openai/whisper/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">OpenAI Whisper License</a>) も適用されます。
+        </li>
+        <li>
+            <strong>ffmpeg (ffmpeg.exe, ffprobe.exe):</strong> バージョン <code>7.1.1-essentials_build</code> を使用しています。
+            FFmpeg の "essentials" ビルドは通常、LGPL v2.1またはそれ以降のライブラリを中心に構成されています。
+            詳細は <a href="https://www.ffmpeg.org/legal.html" target="_blank" rel="noopener noreferrer">ffmpeg公式サイトのLegalページ</a> をご確認ください。同梱されているビルドの正確なライセンスを確認することが推奨されます。
+        </li>
+    </ul>
+
+    <h2>今後の課題と検討事項</h2>
+
+    <p>以下の項目については、今後の開発・運用において検討・対応が必要です（規定準拠確認書より抜粋）。</p>
+    <ul>
+        <li><strong>ライセンス:</strong>
+            <ul>
+                <li>外部実行ファイル ffmpeg (`7.1.1-essentials_build`) は通常LGPLであり、本アプリケーション(GPL v3)から外部プロセスとして呼び出すことはライセンス上互換性があります。配布時には ffmpeg のライセンス条文 (通常は `LICENSE.txt` や `COPYING.txt` など) を同梱することが推奨されます。</li>
+            </ul>
+        </li>
+        <li><strong>運用プロセス:</strong>
+            <ul>
+                <li>本プロジェクトはGitによるバージョン管理を行います。v1.0.0リリース以降の変更管理プロセス（コミットメッセージ規約、ブランチ戦略等）を確立・運用する必要があります。</li>
+                <li>メンテナンス担当者、ドキュメント更新担当者の具体的な担当者名を決定する。</li>
+            </ul>
+        </li>
+        <li><strong>セキュリティ:</strong>
+            <ul>
+                <li><strong>依存ライブラリ更新:</strong> アプリケーションの更新版を社内リリースする際には、<code>requirements.txt</code> を確認し、依存ライブラリのセキュリティ脆弱性をチェック、必要に応じて更新するプロセスとします。</li>
+                <li><strong>脆弱性管理プロセス:</strong> 上記の更新プロセスを定期的に（例: 半年に一度）実施することを検討します。</li>
+                <li><strong>セキュリティテスト:</strong> 将来的に必要に応じて計画・実施を検討します。</li>
+                <li><strong>APIキー管理:</strong> 現在、APIキーはローカルの <code>config/settings.json</code> に平文で保存されます。アクセス権管理が重要です。
+                    <ul>
+                        <li><strong>対応方針案:</strong></li>
+                        <li>実行環境へのアクセス権を適切に管理し、不正アクセスを防ぐ。</li>
+                        <li>可能であれば、将来的によりセキュアな管理方法（環境変数、専用シークレット管理ツール等）への移行を検討する。</li>
+                        <li>定期的なキーのローテーションを推奨する。</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li><strong>ドキュメント:</strong>
+            <ul>
+                <li>FAQ（よくある質問と回答）およびトラブルシューティングガイドを作成する。</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>FAQ（よくある質問と回答）</h2>
+    <dl>
+        <dt>Q1: 文字起こしがうまくできません。</dt>
+        <dd>A1: 音声ファイルの品質を確認してください。周囲のノイズが大きい、話者の声が小さいなどの場合、精度が低下することがあります。また、適切なモデルサイズ（medium以上推奨）を選択しているか確認してください。</dd>
+
+        <dt>Q2: 要約結果がおかしいです。</dt>
+        <dd>A2: 文字起こし内容が正確か確認してください。文字起こしに誤りが多いと要約の質も低下します。また、選択している要約タイプやモデル、カスタムプロンプトが適切か見直してください。追加資料がある場合は、その内容が要約に適しているかも確認が必要です。</dd>
+
+        <dt>Q3: OpenAI APIキーはどこで取得できますか？</dt>
+        <dd>A3: OpenAI公式サイト (<a href="https://platform.openai.com/" target="_blank" rel="noopener noreferrer">https://platform.openai.com/</a>) でアカウントを作成し、APIキーを発行してください。API利用には料金が発生する場合があります。</dd>
+
+        <dt>Q4: Faster Whisper XXL や ffmpeg はどこに置けばいいですか？</dt>
+        <dd>A4: 本アプリケーションのプロジェクトフォルダ内にある <code>Faster-Whisper-XXL</code> という名前のフォルダに、<code>faster-whisper-xxl.exe</code>, <code>ffmpeg.exe</code>, <code>ffprobe.exe</code> を配置してください。</dd>
+
+        <dt>Q5: 音声の再生ができません（エラーが出る）。</dt>
+        <dd>A5: いくつかの原因が考えられます。
+            <ul>
+                <li>元の音声ファイルが存在しない、または移動されている。</li>
+                <li>必要なコーデックがPCにインストールされていない。依存関係セクションにある K-Lite Codec Pack のインストールを試してみてください。</li>
+                <li>(一時的に) ffmpegによる変換処理に失敗している。アプリケーションを再起動して再度試してみてください。</li>
+            </ul>
+        </dd>
+    </dl>
+
+    <h2>改訂履歴</h2>
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr>
+                <th style="padding: 8px; text-align: left;">改訂日</th>
+                <th style="padding: 8px; text-align: left;">バージョン</th>
+                <th style="padding: 8px; text-align: left;">改訂者</th>
+                <th style="padding: 8px; text-align: left;">改訂内容</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 8px;">2024年MM月DD日</td>
+                <td style="padding: 8px;">1.0.0 (仮)</td>
+                <td style="padding: 8px;">(担当者名)</td>
+                <td style="padding: 8px;">初版作成 (README.mdからの変換、ライセンス情報、課題、FAQ、改訂履歴の追加)</td>
+            </tr>
+            <!-- 必要に応じて行を追加 -->
+        </tbody>
+    </table>
+
+</body>
+</html>
