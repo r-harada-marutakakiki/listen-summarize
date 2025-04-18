@@ -209,39 +209,96 @@
         </li>
     </ul>
 
+    <h2>バージョン管理 (Git)</h2>
+
+    <p>本プロジェクトでは、バージョン管理システムとしてGitを使用します。以下の規約と戦略に従って運用することを推奨します。</p>
+
+    <h3>コミットメッセージ規約</h3>
+    <p>コミットメッセージは、変更内容を明確かつ簡潔に伝えるために、以下の形式を推奨します（<a href="https://www.conventionalcommits.org/" target="_blank" rel="noopener noreferrer">Conventional Commits</a> 形式を参考にしています）。</p>
+    <pre><code>&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;
+
+[&lt;body&gt;]
+
+[&lt;footer&gt;]</code></pre>
+    <ul>
+        <li>
+            <strong>type:</strong> コミットの種類を表します。
+            <ul>
+                <li><code>feat</code>: 新機能の追加</li>
+                <li><code>fix</code>: バグ修正</li>
+                <li><code>docs</code>: ドキュメントのみの変更</li>
+                <li><code>style</code>: コードの動作に影響しないスタイルの変更（空白、フォーマット、セミコロンなど）</li>
+                <li><code>refactor</code>: バグ修正や機能追加ではないコード変更（リファクタリング）</li>
+                <li><code>perf</code>: パフォーマンスを向上させるコード変更</li>
+                <li><code>test</code>: 不足しているテストの追加や既存テストの修正</li>
+                <li><code>build</code>: ビルドシステムや外部依存関係に影響する変更（例: requirements.txt）</li>
+                <li><code>ci</code>: CI構成ファイルやスクリプトの変更</li>
+                <li><code>chore</code>: 上記以外の変更（例: .gitignore の更新）</li>
+                <li><code>revert</code>: 以前のコミットを元に戻す場合</li>
+            </ul>
+        </li>
+        <li><strong>scope (任意):</strong> コミットが影響を与える範囲（例: <code>ui</code>, <code>transcribe</code>, <code>summary</code>, <code>docs</code>）。</li>
+        <li><strong>subject:</strong> 変更内容の短い要約（50文字以内推奨、命令形、小文字で始める）。</li>
+        <li><strong>body (任意):</strong> 変更の動機や詳細な説明。</li>
+        <li><strong>footer (任意):</strong> 破壊的変更 (<code>BREAKING CHANGE:</code>) や関連するIssue番号 (<code>Refs: #123</code>) などを記載。</li>
+    </ul>
+    <p>例:</p>
+    <pre><code>feat(ui): SRTファイルのエクスポート機能を追加
+
+文字起こし結果をSRT形式で保存できるようにする。
+ファイルメニューに「SRTエクスポート」を追加。
+
+Refs: #42</code></pre>
+    <pre><code>fix(audio): 特定のMP3ファイルで再生位置がずれる問題を修正</code></pre>
+    <pre><code>docs: READMEに使用方法の詳細を追加</code></pre>
+
+    <h3>ブランチ戦略</h3>
+    <p>シンプルで一般的なブランチ戦略として、以下を推奨します（GitHub Flow に近いです）。</p>
+    <ul>
+        <li>
+            <strong><code>main</code> ブランチ:</strong>
+            <ul>
+                <li>常に安定しており、リリース可能な状態を保ちます。</li>
+                <li>原則として、直接コミットは行いません。</li>
+            </ul>
+        </li>
+        <li>
+            <strong>フィーチャーブランチ (トピックブランチ):</strong>
+            <ul>
+                <li>新しい機能の開発やバグ修正は、<code>main</code> ブランチから分岐した新しいブランチで行います。</li>
+                <li>ブランチ名は、作業内容がわかるように命名します（例: <code>feat/add-srt-export</code>, <code>fix/audio-playback-error</code>, <code>docs/update-readme</code>）。</li>
+                <li>作業が完了し、テスト等で問題がないことを確認したら、<code>main</code> ブランチへのマージをリクエストします（Pull Request / Merge Request を使用するのが望ましい）。</li>
+                <li>マージ後、不要になったフィーチャーブランチは削除します。</li>
+            </ul>
+        </li>
+        <li>
+            <strong>リリース (任意):</strong>
+            <ul>
+                <li><code>main</code> ブランチ上でリリースするコミットに、バージョン番号のタグ（例: <code>v1.0.0</code>, <code>v1.1.0</code>）を付与することを推奨します。</li>
+            </ul>
+        </li>
+    </ul>
+
     <h2>今後の課題と検討事項</h2>
 
-    <p>以下の項目については、今後の開発・運用において検討・対応が必要です（規定準拠確認書より抜粋）。</p>
+    <p>以下の項目については、今後の開発・運用において検討・対応が必要です。</p>
     <ul>
         <li><strong>ライセンス:</strong>
             <ul>
-                <li>外部実行ファイル ffmpeg (`7.1.1-essentials_build`) は通常LGPLであり、本アプリケーション(GPL v3)から外部プロセスとして呼び出すことはライセンス上互換性があります。配布時には ffmpeg のライセンス条文 (通常は `LICENSE.txt` や `COPYING.txt` など) を同梱することが推奨されます。</li>
-            </ul>
-        </li>
-        <li><strong>運用プロセス:</strong>
-            <ul>
-                <li>本プロジェクトはGitによるバージョン管理を行います。v1.0.0リリース以降の変更管理プロセス（コミットメッセージ規約、ブランチ戦略等）を確立・運用する必要があります。</li>
-                <li>メンテナンス担当者、ドキュメント更新担当者の具体的な担当者名を決定する。</li>
+                <li>本アプリケーション配布時には、<code>Faster-Whisper-XXL</code> ディレクトリ内に同梱されている ffmpeg のライセンス条文ファイル (<code>COPYING.LGPLv3</code>, <code>COPYING.LGPLv2.1</code>) も含める必要があります。</li>
             </ul>
         </li>
         <li><strong>セキュリティ:</strong>
             <ul>
-                <li><strong>依存ライブラリ更新:</strong> アプリケーションの更新版を社内リリースする際には、<code>requirements.txt</code> を確認し、依存ライブラリのセキュリティ脆弱性をチェック、必要に応じて更新するプロセスとします。</li>
-                <li><strong>脆弱性管理プロセス:</strong> 上記の更新プロセスを定期的に（例: 半年に一度）実施することを検討します。</li>
-                <li><strong>セキュリティテスト:</strong> 将来的に必要に応じて計画・実施を検討します。</li>
-                <li><strong>APIキー管理:</strong> 現在、APIキーはローカルの <code>config/settings.json</code> に平文で保存されます。アクセス権管理が重要です。
+                <li><strong>依存ライブラリ更新:</strong> アプリケーションの更新版を社内リリースする際には、<code>requirements.txt</code> を確認し、依存ライブラリのセキュリティ脆弱性をチェック、必要に応じて更新します。</li>
+                <li><strong>APIキー管理:</strong> 現在、APIキーはローカルの <code>config/openai_api_key.txt</code> に平文で保存されます。このファイルへのアクセス権管理が重要です。
                     <ul>
                         <li><strong>対応方針案:</strong></li>
-                        <li>実行環境へのアクセス権を適切に管理し、不正アクセスを防ぐ。</li>
+                        <li>実行環境および <code>config/openai_api_key.txt</code> へのアクセス権を適切に管理し、不正アクセスを防ぐ。</li>
                         <li>可能であれば、将来的によりセキュアな管理方法（環境変数、専用シークレット管理ツール等）への移行を検討する。</li>
                         <li>定期的なキーのローテーションを推奨する。</li>
                     </ul>
                 </li>
-            </ul>
-        </li>
-        <li><strong>ドキュメント:</strong>
-            <ul>
-                <li>FAQ（よくある質問と回答）およびトラブルシューティングガイドを作成する。</li>
             </ul>
         </li>
     </ul>
@@ -249,7 +306,7 @@
     <h2>FAQ（よくある質問と回答）</h2>
     <dl>
         <dt>Q1: 文字起こしがうまくできません。</dt>
-        <dd>A1: 音声ファイルの品質を確認してください。周囲のノイズが大きい、話者の声が小さいなどの場合、精度が低下することがあります。また、適切なモデルサイズ（medium以上推奨）を選択しているか確認してください。</dd>
+        <dd>A1: 音声ファイルの品質を確認してください。周囲のノイズが大きい、話者の声が小さいなどの場合、精度が低下することがあります。エラーが発生し解決できない場合は、エラーメッセージや状況を記録し、プロジェクトフォルダ内の <code>logs</code> フォルダにある最新のログファイル（例: <code>transcription_*.log</code>）の内容を添えて、システム管理課にお問い合わせください。</dd>
 
         <dt>Q2: 要約結果がおかしいです。</dt>
         <dd>A2: 文字起こし内容が正確か確認してください。文字起こしに誤りが多いと要約の質も低下します。また、選択している要約タイプやモデル、カスタムプロンプトが適切か見直してください。追加資料がある場合は、その内容が要約に適しているかも確認が必要です。</dd>
@@ -267,6 +324,7 @@
                 <li>必要なコーデックがPCにインストールされていない。依存関係セクションにある K-Lite Codec Pack のインストールを試してみてください。</li>
                 <li>(一時的に) ffmpegによる変換処理に失敗している。アプリケーションを再起動して再度試してみてください。</li>
             </ul>
+            上記を確認しても解決しない場合、表示されるエラーメッセージや操作状況を記録し、プロジェクトフォルダ内の <code>logs</code> フォルダにある最新のログファイル（例: <code>audio_player_*.log</code> や <code>main_app_*.log</code>）の内容を添えて、システム管理課にお問い合わせください。
         </dd>
     </dl>
 
@@ -282,10 +340,10 @@
         </thead>
         <tbody>
             <tr>
-                <td style="padding: 8px;">2024年MM月DD日</td>
-                <td style="padding: 8px;">1.0.0 (仮)</td>
-                <td style="padding: 8px;">(担当者名)</td>
-                <td style="padding: 8px;">初版作成 (README.mdからの変換、ライセンス情報、課題、FAQ、改訂履歴の追加)</td>
+                <td style="padding: 8px;">2025年4月18日</td>
+                <td style="padding: 8px;">1.0.0</td>
+                <td style="padding: 8px;">原田 諒</td>
+                <td style="padding: 8px;">初期リリース</td>
             </tr>
             <!-- 必要に応じて行を追加 -->
         </tbody>
