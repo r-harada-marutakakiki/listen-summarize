@@ -118,8 +118,15 @@
             <strong>実行:</strong> <code>main.py</code> を実行します。
             <pre><code>python main.py</code></pre>
             <p>Python (.py) ファイルが Python インタープリターに関連付けられている場合は、<code>main.py</code> を直接ダブルクリックして起動することも可能です。</p>
+            <p><strong>重要:</strong> 実行前に、OpenAI APIキーを環境変数 <code>OPENAI_API_KEY</code> に設定しておく必要があります。設定されていない場合、アプリケーション起動時にエラーメッセージが表示されます。</p>
+            <p><strong>環境変数の設定例:</strong></p>
+            <ul>
+                <li>Windows (コマンドプロンプト, 一時的): <code>set OPENAI_API_KEY=sk-your_api_key_here</code></li>
+                <li>Windows (PowerShell, 一時的): <code>$env:OPENAI_API_KEY="sk-your_api_key_here"</code></li>
+                <li>macOS/Linux (ターミナル, 一時的): <code>export OPENAI_API_KEY=sk-your_api_key_here</code></li>
+            </ul>
+            <p>(恒久的な設定方法はOSによって異なります。必要に応じて調べてください)</p>
         </li>
-        <li><strong>OpenAI APIキー設定:</strong> 初回起動時や必要に応じて、設定欄にOpenAI APIキーを入力し「保存」ボタンを押します。</li>
         <li>
             <strong>ファイル選択:</strong>
             <ul>
@@ -168,7 +175,7 @@
     <h2>注意事項</h2>
 
     <ul>
-        <li>OpenAI APIの利用には別途APIキーの取得と利用料金が必要です。</li>
+        <li>OpenAI APIの利用には別途APIキーの取得と利用料金が必要です。<strong>APIキーは環境変数 <code>OPENAI_API_KEY</code> から読み込まれます。</strong></li>
         <li>文字起こしや要約の精度は、元の音声の品質、モデル、プロンプトの内容によって変化します。</li>
         <li><code>ffmpeg</code> の変換処理には時間がかかる場合があります。</li>
     </ul>
