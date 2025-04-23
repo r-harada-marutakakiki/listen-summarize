@@ -27,7 +27,7 @@ from PyQt5.QtGui import QIcon, QFont, QDesktopServices
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
 # 自作モジュールのインポート
-from config.api_config import load_api_key, AVAILABLE_MODELS, DEFAULT_MODEL, MODEL_INFO
+from config.api_config import get_api_key, AVAILABLE_MODELS, DEFAULT_MODEL, MODEL_INFO
 from config.prompts import (
     DEFAULT_SUMMARY_PROMPT, SHORT_SUMMARY_PROMPT, 
     DETAILED_ANALYSIS_PROMPT, load_prompt_from_file
@@ -76,10 +76,16 @@ class MainWindow(QMainWindow):
         self.progress_timer = QTimer()
         self.progress_timer.timeout.connect(self.update_progress_style)
         
-        # APIキーの読み込み
-        api_key = load_api_key()
-        if api_key:
+        # APIキーの読み込みと設定 (環境変数から)
+        try:
+            api_key = get_api_key()
             self.openai_api.set_api_key(api_key)
+            print("OpenAI APIキーを環境変数から正常に読み込みました。")
+        except ValueError as e:
+            print(f"エラー: {e}", file=sys.stderr)
+            QMessageBox.critical(self, "APIキーエラー", str(e) + "\n環境変数 'OPENAI_API_KEY' を設定してください。")
+            # 必要に応じてアプリケーションを終了
+            sys.exit(1) # 例: アプリケーション終了
         
         # UIの初期化
         self.init_ui()
@@ -140,19 +146,6 @@ class MainWindow(QMainWindow):
         output_layout.addWidget(self.output_path_label, 1)
         output_layout.addWidget(output_browse_btn)
         
-        # APIキー設定
-        api_layout = QHBoxLayout()
-        api_label = QLabel("OpenAI APIキー:")
-        self.api_key_input = QLineEdit()
-        self.api_key_input.setEchoMode(QLineEdit.Password)
-        self.api_key_input.setPlaceholderText("sk-...")
-        api_save_btn = QPushButton("保存")
-        api_save_btn.clicked.connect(self.save_api_key)
-        
-        api_layout.addWidget(api_label)
-        api_layout.addWidget(self.api_key_input, 1)
-        api_layout.addWidget(api_save_btn)
-        
         # モデル選択
         model_layout = QHBoxLayout()
         model_label = QLabel("生成AIモデル:")
@@ -198,7 +191,6 @@ class MainWindow(QMainWindow):
         top_layout.addLayout(audio_layout)
         top_layout.addLayout(document_layout)
         top_layout.addLayout(output_layout)
-        top_layout.addLayout(api_layout)
         top_layout.addLayout(model_layout)
         top_layout.addLayout(run_layout)
         top_layout.addLayout(progress_layout)
@@ -305,12 +297,6 @@ class MainWindow(QMainWindow):
         # メインレイアウトに追加
         main_layout.addWidget(top_section)
         main_layout.addWidget(self.tabs, 1)
-        
-        # APIキーの設定
-        api_key = load_api_key()
-        if api_key:
-            self.api_key_input.setText(api_key)
-            self.openai_api.set_api_key(api_key)
     
     def connect_signals(self):
         """シグナルとスロットの接続"""
@@ -415,22 +401,6 @@ class MainWindow(QMainWindow):
             # self.prompt_file_path.setText("未選択")
             # self.prompt_file_path.setToolTip("")
             pass # 選択がキャンセルされた場合は何もしない方が良い場合もある
-    
-    def save_api_key(self):
-        """APIキーを保存"""
-        api_key = self.api_key_input.text().strip()
-        if not api_key:
-            QMessageBox.warning(self, "警告", "APIキーを入力してください")
-            return
-        
-        # APIキーをファイルに保存
-        os.makedirs(os.path.dirname(os.path.abspath("config/openai_api_key.txt")), exist_ok=True)
-        with open("config/openai_api_key.txt", "w", encoding="utf-8") as f:
-            f.write(api_key)
-        
-        # APIキーをセット
-        self.openai_api.set_api_key(api_key)
-        QMessageBox.information(self, "完了", "APIキーを保存しました")
     
     def toggle_custom_prompt_area(self, checked):
         """カスタムプロンプト入力エリアの有効/無効を切り替え"""

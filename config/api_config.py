@@ -2,25 +2,14 @@
 OpenAI APIキーと設定を管理するファイル
 """
 
-# APIキーを保存するファイルのパス（デフォルト）
-API_KEY_FILE = "config/openai_api_key.txt"
+import os
 
-def load_api_key(file_path=None):
-    """
-    APIキーをファイルから読み込む
-    
-    Args:
-        file_path (str, optional): APIキーファイルのパス
-        
-    Returns:
-        str: APIキー
-    """
-    path = file_path or API_KEY_FILE
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return ""
+def get_api_key():
+    # 環境変数からAPIキーを取得
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("環境変数 'OPENAI_API_KEY' が設定されていません。")
+    return api_key
 
 # モデル設定
 DEFAULT_MODEL = "gpt-4o"
