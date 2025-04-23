@@ -147,3 +147,5 @@ _models/ # Assuming models are large and/or downloaded
 # Ignore the entire Faster-Whisper-XXL directory and its contents
 Faster-Whisper-XXL/
 
+config/openai_api_key.txt
+
